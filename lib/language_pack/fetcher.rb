@@ -6,7 +6,8 @@ module LanguagePack
     include ShellHelpers
     CDN_YAML_FILE = File.expand_path("../../../config/cdn.yml", __FILE__)
 
-    def initialize(host_url)
+    def initialize(host_url, cache = nil)
+      @cache    = cache
       @config   = load_config
       @host_url = fetch_cdn(host_url)
     end
@@ -17,8 +18,15 @@ module LanguagePack
     end
 
     def fetch_untar(path)
-      curl = curl_command("#{@host_url.join(path)} -s -o")
-      run!("#{curl} - | tar zxf -")
+      base_path = File.basename(path).gsub(/(\.tgz|\.tar\.gz)$/, '')
+      if cache and cache.exists? base_path
+        cache.load base_path
+      else
+        curl = curl_command("#{@host_url.join(path)} -s -o")
+        run!("#{curl} - | tar zxf -")
+        puts Dir['./*'].join("\n")
+        cache.store base_path if cache
+      end
     end
 
     def fetch_bunzip2(path)
@@ -27,6 +35,8 @@ module LanguagePack
     end
 
     private
+    attr_reader :cache
+
     def curl_command(command)
       "set -o pipefail; curl --fail --retry 3 --retry-delay 1 --connect-timeout #{curl_connect_timeout_in_seconds} --max-time #{curl_timeout_in_seconds} #{command}"
     end
