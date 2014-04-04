@@ -23,12 +23,14 @@ module LanguagePack
         puts "== fetch_untar cache-hit: #{path} --> #{base_path}"
         cache.load base_path
       else
-        puts "== fetch_untar cache-miss: #{path} --> #{base_path}"
+        puts "== fetch_untar cache-miss: #{path} --> #{base_path}" if cache
         curl = curl_command("#{@host_url.join(path)} -s -o")
         run!("#{curl} #{base_path}")
-        puts "== PWD: #{Dir.pwd}"
-        puts Dir['./*'].join("\n")
-        cache.store base_path if cache
+        if cache
+          puts "== PWD: #{Dir.pwd}"
+          puts Dir['./*'].join("\n")
+          cache.store base_path
+        end
       end
       run!("cat #{base_path} | tar zxf -")
       FileUtils.rm_rf(base_path)
