@@ -32,8 +32,12 @@ class LanguagePack::Cache
   # @param [String] destination directory
   def copy(from, to)
     return false unless File.exist?(from)
-    FileUtils.mkdir_p File.dirname(to)
-    system("cp -a #{from}/. #{to}")
+    if File.directory?(from)
+      FileUtils.mkdir_p File.dirname(to)
+      system("cp -a #{from}/. #{to}")
+    else
+      system("cp -a #{from} #{to}")
+    end
   end
 
   # check if the cache content exists
