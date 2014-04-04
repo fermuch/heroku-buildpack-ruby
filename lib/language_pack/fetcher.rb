@@ -26,6 +26,7 @@ module LanguagePack
         puts "== fetch_untar cache-miss: #{path} --> #{base_path}"
         curl = curl_command("#{@host_url.join(path)} -s -o")
         run!("#{curl} - | tar zxf -")
+        puts "== PWD: #{Dir.pwd}"
         puts Dir['./*'].join("\n")
         cache.store base_path if cache
       end
