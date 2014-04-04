@@ -44,11 +44,7 @@ module LanguagePack
       else
         puts "== fetch_untar cache-miss: #{base_path}" if cache
         yield
-        if cache
-          puts "== PWD: #{Dir.pwd}"
-          puts Dir['./*'].join("\n")
-          cache.store base_path
-        end
+        cache.store base_path if cache
       end
     end
 
