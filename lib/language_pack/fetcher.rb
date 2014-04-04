@@ -18,20 +18,20 @@ module LanguagePack
     end
 
     def fetch_untar(path)
-      base_path = File.basename(path).gsub(/(\.tgz|\.tar\.gz)$/, '')
+      base_path = File.basename(path)
       if cache and cache.exists? base_path
         puts "== fetch_untar cache-hit: #{path} --> #{base_path}"
-        Dir.chdir('..') { cache.load base_path }
+        cache.load base_path
       else
         puts "== fetch_untar cache-miss: #{path} --> #{base_path}"
         curl = curl_command("#{@host_url.join(path)} -s -o")
-        run!("#{curl} - | tar zxf -")
-        Dir.chdir('..') do
-          puts "== PWD: #{Dir.pwd}"
-          puts Dir['./*'].join("\n")
-          cache.store base_path
-        end if cache
+        run!("#{curl} #{base_path}")
+        puts "== PWD: #{Dir.pwd}"
+        puts Dir['./*'].join("\n")
+        cache.store base_path if cache
       end
+      run!("cat #{base_path} | tar zxf -")
+      FileUtils.rm_rf(base_path)
     end
 
     def fetch_bunzip2(path)
