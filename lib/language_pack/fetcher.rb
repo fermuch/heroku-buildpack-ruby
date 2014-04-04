@@ -21,14 +21,16 @@ module LanguagePack
       base_path = File.basename(path).gsub(/(\.tgz|\.tar\.gz)$/, '')
       if cache and cache.exists? base_path
         puts "== fetch_untar cache-hit: #{path} --> #{base_path}"
-        cache.load base_path
+        Dir.chdir('..') { cache.load base_path }
       else
         puts "== fetch_untar cache-miss: #{path} --> #{base_path}"
         curl = curl_command("#{@host_url.join(path)} -s -o")
         run!("#{curl} - | tar zxf -")
-        puts "== PWD: #{Dir.pwd}"
-        puts Dir['./*'].join("\n")
-        cache.store base_path if cache
+        Dir.chdir('..') do
+          puts "== PWD: #{Dir.pwd}"
+          puts Dir['./*'].join("\n")
+          cache.store base_path
+        end if cache
       end
     end
 
