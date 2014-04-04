@@ -50,8 +50,6 @@ module LanguagePack
     end
 
     def run!(command, options = {})
-      puts "Running: #{command}"
-      puts "Options: #{options.inspect}"
       result = run(command, options)
       error("Command: '#{command}' failed unexpectedly:\n#{result}") unless $?.success?
       return result
