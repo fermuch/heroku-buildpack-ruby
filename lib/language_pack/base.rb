@@ -29,7 +29,7 @@ class LanguagePack::Base
       @id           = Digest::SHA1.hexdigest("#{Time.now.to_f}-#{rand(1000000)}")[0..10]
       @warnings     = []
       @deprecations = []
-      @fetchers     = {:buildpack => LanguagePack::Fetcher.new(VENDOR_URL) }
+      @fetchers     = {:buildpack => LanguagePack::Fetcher.new(VENDOR_URL, @cache) }
 
       Dir.chdir build_path
     end
