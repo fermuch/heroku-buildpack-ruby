@@ -36,7 +36,14 @@ class LanguagePack::Base
   end
 
   def instrument(*args, &block)
-    self.class.instrument(*args, &block)
+    start = Time.now
+    result = self.class.instrument(*args, &block)
+    time_taken = Time.now - start
+    message = args.first
+    message += ": #{args[1..-1].join(', ')}" if args.size > 1
+    Kernel.puts "   ~~> #{message} (#{"%.2f" % time_taken}s)"
+    $stdout.flush
+    result
   end
 
   def self.instrument(*args, &block)
